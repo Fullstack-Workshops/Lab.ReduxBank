@@ -768,6 +768,21 @@ withdraw25.onclick = function () {
   return store.dispatch({ type: "withdraw", amount: 25 });
 };
 
+var logger = function logger(store) {
+  return function (next) {
+    return function (action) {
+      console.group(action.type);
+      console.info('dispatching', action);
+      var result = next(action);
+      console.log('next state', store.getState());
+      console.groupEnd(action.type);
+      return result;
+    };
+  };
+};
+
+var middleware = (0, _redux.applyMiddleware)(logger);
+
 var store = (0, _redux.createStore)(function () {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { balance: 0 };
   var action = arguments[1];
@@ -780,11 +795,10 @@ var store = (0, _redux.createStore)(function () {
     default:
       return state;
   }
-});
+}, middleware);
 
 var balanceField = document.getElementById("balance");
 store.subscribe(function () {
-  console.log("The store state changed. Here is the new state:", store.getState());
   balanceField.innerText = "$ " + store.getState().balance;
 });
 

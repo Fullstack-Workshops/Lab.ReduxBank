@@ -1,4 +1,4 @@
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
 
 const balance = document.getElementById("balance");
 const deposit5 = document.getElementById("deposit5");
@@ -11,6 +11,16 @@ deposit25.onclick = () => store.dispatch({ type: "deposit", amount: 25 })
 withdraw5.onclick = () => store.dispatch({ type: "withdraw", amount: 5 })
 withdraw25.onclick = () => store.dispatch({ type: "withdraw", amount: 25 })
 
+const logger = store => next => action => {
+  console.group(action.type);
+  console.info('dispatching', action);
+  const result = next(action);
+  console.log('next state', store.getState());
+  console.groupEnd(action.type);
+  return result;
+};
+
+const middleware = applyMiddleware(logger);
 
 const store = createStore((state = { balance: 0 }, action) => {
   switch (action.type) {
@@ -21,10 +31,9 @@ const store = createStore((state = { balance: 0 }, action) => {
     default:
       return state;
   }
-})
+}, middleware)
 
 const balanceField = document.getElementById("balance");
 store.subscribe(() => {
-  console.log("The store state changed. Here is the new state:", store.getState());
   balanceField.innerText = `$ ${store.getState().balance}`
 })
