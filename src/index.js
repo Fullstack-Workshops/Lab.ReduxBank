@@ -1,5 +1,4 @@
-import { createStore, applyMiddleware } from "redux";
-import loggingMiddleware from 'redux-logger'
+import { createStore } from "redux";
 
 const balance = document.getElementById("balance");
 const deposit5 = document.getElementById("deposit5");
@@ -7,35 +6,25 @@ const deposit25 = document.getElementById("deposit25");
 const withdraw5 = document.getElementById("withdraw5");
 const withdraw25 = document.getElementById("withdraw25");
 
-//Action Creators
-const depositMoney = amount => ({
-  type: 'deposit',
-  amount
-})
-const withdrawMoney = amount => ({
-  type: 'withdraw',
-  amount
-})
+deposit5.onclick = () => store.dispatch({ type: "deposit", amount: 5 })
+deposit25.onclick = () => store.dispatch({ type: "deposit", amount: 25 })
+withdraw5.onclick = () => store.dispatch({ type: "withdraw", amount: 5 })
+withdraw25.onclick = () => store.dispatch({ type: "withdraw", amount: 25 })
 
 
-const reducer = (state = { balance: 0 }, action) => {
+const store = createStore((state = { balance: 0 }, action) => {
   switch (action.type) {
-    case 'deposit':
+    case "deposit":
       return { balance: state.balance + action.amount }
     case "withdraw":
       return { balance: state.balance - action.amount }
     default:
       return state;
   }
-}
+})
 
-const store = createStore(reducer, applyMiddleware(loggingMiddleware))
-
-deposit5.onclick = () => store.dispatch(depositMoney(5))
-deposit25.onclick = () => store.dispatch(depositMoney(25))
-withdraw5.onclick = () => store.dispatch(withdrawMoney(5))
-withdraw25.onclick = () => store.dispatch(withdrawMoney(25))
-
+const balanceField = document.getElementById("balance");
 store.subscribe(() => {
-  balance.innerText = `$ ${store.getState().balance}`
+  console.log("The store state changed. Here is the new state:", store.getState());
+  balanceField.innerText = `$ ${store.getState().balance}`
 })
